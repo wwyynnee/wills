@@ -1,0 +1,23 @@
+{
+  "name": "wills-discord",
+  "version": "1.0.0",
+  "description": "Awesome discord bot",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@vitalets/google-translate-api": "^8.0.0",
+    "clever-bot-api": "^1.5.4",
+    "discord.js": "^13.8.1",
+    "express": "^4.18.1",
+    "fs": "^0.0.1-security",
+    "mal-scraper": "^2.11.4",
+    "moment": "^2.29.4",
+    "ms": "^2.1.3",
+    "node-fetch": "^3.2.6"
+  }
+}
