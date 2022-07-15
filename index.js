@@ -84,6 +84,285 @@ client.on("messageCreate", async message => {
     if (message.author.bot) return;
     if (!message.content.startsWith(prefix)) return;
 
+    /*
+      Модерация
+    */
+    
+    const ModeratorBot = require("discord-moderator");
+    client.moderator = new ModeratorBot(client);
+    
+    const member = message.mentions.members.last() || message.member.id; // Участник
+    const reason = args.slice(1).join(" "); // Причина
+    const role = message.mentions.roles.last() || message.guild.roles.id || args.join(" "); // Роль
+    const roleAdd = message.mentions.roles.last() || args.slice(1).join(" ");
+    
+    if (cmd === "warn") { // Выдавать предупреждения пользователю
+      if (!message.member.permissions.has("BAN_MEMBERS") || !message.member.permissions.has("KICK_MEMBERS")) {
+        return message.channel.send("У вас нет прав [Банить или Кикать]");
+      } else if (!member) {
+        return message.channel.send("Укажите пользователя");
+      } else if (!reason) {
+        return message.channel.send("Укажите причину для предупреждения");
+      }
+
+      client.moderator.warns.add(member, message.channel, reason, message.author.id, "999999999999999999").then(data => {
+        const warn = new Discord.MessageEmbed()
+          .setTitle("Предупреждение")
+          .setColor("BLACK")
+          .addFields(
+            {
+              name: "Выдал:", value: `${message.author}`
+            },
+            {
+              name: "Нарушитель:", value: `${member}`
+            },
+            {
+              name: "Причина:", value: `${reason}`
+            },
+          )
+          .setTimestamp()
+        return message.channel.send({
+          embeds: [warn]
+        });
+      }).catch(err => {
+        translate(`${err.message}`, {
+          from: "en",
+          to: "ru"
+        }).then(res => {
+          return message.channel.send(res.text)
+        })
+      })
+      
+    } else if (cmd === "unwarn") { // Убрать предупреждение у пользователя
+      if (!message.member.permissions.has("BAN_MEMBERS") || !message.member.permissions.has("KICK_MEMBERS")) {
+        return message.channel.send("У вас нет прав [Банить или Кикать]");
+      } else if (!member) {
+        return message.channel.send("Укажите пользователя для отмены предупреждения");
+      }
+
+      client.moderator.warns.remove(member).then(data => {
+        const unwarn = new Discord.MessageEmbed()
+          .setTitle("Снятие предупреждения")
+          .setColor("BLACK")
+          .addFields(
+            {
+              name: "Убрал:", value: `${message.author}`
+            },
+            {
+              name: "У пользователя:", value: `${member}`
+            },
+          )
+          .setTimestamp()
+        return message.channel.send({
+          embeds: [unwarn]
+        });
+      }).catch(err => {
+        translate(`${err.message}`, {
+          from: "en",
+          to: "ru"
+        }).then(res => {
+          return message.channel.send(res.text)
+        })
+      })
+      
+    } else if (cmd === "warns") { // Просмотр предупреждений у пользователя
+      if (!message.member.permissions.has("BAN_MEMBERS") || !message.member.permissions.has("KICK_MEMBERS")) {
+        return message.channel.send("У вас нет прав [Банить или Кикать]");
+      } else if (!member) {
+        return message.channel.send("Укажите пользователя для получения предупреждений");
+      }
+
+      client.moderator.warns.getAll(member).then(data => {
+        const warns = new Discord.MessageEmbed()
+          .setTitle("Просмотр предупреждений")
+          .setColor("BLACK")
+          .addFields(
+            {
+              name: "Кол-во предупреждений:", value: `${data.warns}`
+            },
+          )
+          .setTimestamp()
+        return message.channel.send({
+          embeds: [warns]
+        });
+      }).catch(err => {
+        translate(`${err.message}`, {
+          from: "en",
+          to: "ru"
+        }).then(res => {
+          return message.channel.send(res.text)
+        })
+      })
+      
+    } else if (cmd === "role") { // Информация о роли
+      if (!message.member.permissions.has("MANAGE_ROLES")) {
+        return message.channel.send("У вас нет прав [Управление ролями]");
+      } else if (!role) {
+        return message.channel.send("Укажите роль для получения информации");
+      }
+
+      client.moderator.roles.get(message.guild, role).then(data => {
+        if (!data.status) {
+          return message.channel.send("Роль не найдена");
+        }
+        
+        const role = new Discord.MessageEmbed()
+          .setTitle("О роли")
+          .setColor("BLACK")
+          .addFields(
+            {
+              name: "Имя:", value: `${data.role.name}`
+            },
+            {
+              name: "Цвет:", value: `${data.role.color}`
+            },
+            {
+              name: "Позиция:", value: `${data.role.position}`
+            },
+            {
+              name: "Упоминания", value: `${data.role.mentionable}`
+            },
+          )
+        return message.channel.send({
+          embeds: [role]
+        });
+      }).catch(err => {
+        translate(`${err.message}`, {
+          from: "en",
+          to: "ru"
+        }).then(res => {
+          return message.channel.send(res.text)
+        })
+      })
+      
+    } else if (cmd === "roles") { // Вывести все роли
+      if (!message.member.permissions.has("MANAGE_ROLES")) {
+        return message.channel.send("У вас нет прав [Управление ролями]");
+      }
+      
+      client.moderator.roles.getAll(message.guild).then(data => {
+        const roles = new Discord.MessageEmbed()
+          .setTitle("Все роли")
+          .setColor("BLACK")
+          .setDescription( data.map( role => `\`${role.name}\`` ).join(", ") )
+        return message.channel.send({
+          embeds: [roles]
+        })
+      }).catch(err => {
+        translate(`${err.message}`, {
+          from: "en",
+          to: "ru"
+        }).then(res => {
+          return message.channel.send(res.text)
+        })
+      })
+      
+    } else if (cmd === "addrole") { // Добавить роль участнику
+      if (!message.member.permissions.has("MANAGE_ROLES")) {
+        return message.channel.send("У вас нет прав [Управление ролями]");
+      } else if (!member) {
+        return message.channel.send("Укажите пользователя для добавления роли");
+      } else if (!roleAdd) {
+        return message.channel.send("Укажите роль для добавления");
+      }
+
+      client.moderator.roles.add(member, role).then(data => {
+        const addRole = new Discord.MessageEmbed()
+          .setTitle("Добавление роли")
+          .setColor("BLACK")
+          .addFields(
+            {
+              name: "Выполнил:", value: `${message.author}`
+            },
+            {
+              name: "Для пользователя:", value: `${member}`
+            },
+            {
+              name: "Роль:", value: `${role}`
+            },
+          )
+          .setTimestamp()
+        return message.channel.send({
+          embeds: [addRole]
+        });
+      }).catch(err => {
+        translate(`${err.message}`, {
+          from: "en",
+          to: "ru"
+        }).then(res => {
+          return message.channel.send(res.text)
+        })
+      })
+      
+    } else if (cmd === "delrole") { // Убрать роль участнику
+      if (!message.member.permissions.has("MANAGE_ROLES")) {
+        return message.channel.send("У вас нет прав [Управление ролями]");
+      } else if (!member) {
+        return message.channel.send("Укажите пользователя для снятия роли");
+      } else if (!role) {
+        return message.channel.send("Укажите роль для снятия");
+      } else if (reason) {
+        client.moderator.roles.remove(member, role, reason).then(data => {
+          const delRoleReason = new Discord.MessageEmbed()
+            .setTitle("Снятие роли")
+            .setColor("BLACK")
+            .addFields(
+              {
+                name: "Выполнил:", value: `${message.author}`
+              },
+              {
+                name: "Для пользователя:", value: `${member}`
+              },
+              {
+                name: "Роль:", value: `${role}`
+              },
+              {
+                name: "Причина:", value: `${reason}`
+              },
+            )
+            .setTimestamp()
+          return message.channel.send({
+            embeds: [delRoleReason]
+          });
+        })
+      } else if (!reason) {
+        client.moderator.roles.remove(member, role).then(data => {
+          const delRole = new Discord.MessageEmbed()
+            .setTitle("Снятие роли")
+            .setColor("BLACK")
+            .addFields(
+              {
+                name: "Выполнил:", value: `${message.author}`
+              },
+              {
+                name: "Для пользователя:", value: `${member}`
+              },
+              {
+                name: "Роль:", value: `${role}`
+              },
+              {
+                name: "Причина:", value: "Отсутствует"
+              },
+            )
+            .setTimestamp()
+          return message.channel.send({
+            embeds: [delRole]
+          });
+        }).catch(err => {
+          translate(`${err.message}`, {
+            from: "en",
+            to: "ru"
+          }).then(res => {
+            return message.channel.send(res.text)
+          })
+        })
+      }
+    }
+
+    /*
+      Общее
+    */
+
     if (cmd === "help") {
       const help = new Discord.MessageEmbed()
         .setTitle("Список команд")
@@ -99,7 +378,7 @@ client.on("messageCreate", async message => {
             name: "Музыкальные", value: `w.play — Включить музыку\nw.skip — Пропуск трека\nw.lyrics — Текст песни\nw.queue — Добавить в очередь\nw.filter — Установить фильтр\nw.join — Подключение к голосовому каналу\nw.leave — Отключить от голосового канала`
           },*/
           {
-            name: "Модерация", value: `w.clear — Удалить сообщения\nw.say — Написать от лица бота\nw.announce — Сделать объявление`
+            name: "Модерация", value: `w.warn — Выдать предупреждение\nw.unwarn — Снять предупреждение\nw.warns — Просмотр предупреждений\nw.clear — Удалить сообщения\nw.say — Написать от лица бота\nw.announce — Сделать объявление`
           },
         )
         .setFooter({

@@ -12,6 +12,7 @@
   "dependencies": {
     "@vitalets/google-translate-api": "^8.0.0",
     "clever-bot-api": "^1.5.4",
+    "discord-moderator": "^1.1.6",
     "discord.js": "^13.8.1",
     "express": "^4.18.1",
     "fs": "^0.0.1-security",
