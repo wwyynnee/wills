@@ -15,7 +15,8 @@ try {
   client.on("ready", () => {
     client.user.setPresence({
       activities: [{
-        name: "w.help"
+        name: "w.help",
+        type: "WATCHING"
       }],
       status: "idle"
     });
@@ -25,10 +26,10 @@ try {
       dnd - Не беспокоить
     */
     /*
-      Playing - Играет
-      Streaming - Cтримит
-      Listening - Cлушает
-      Watching - Cмотрит
+      PLAYING - Играет
+      STREAMING - Cтримит
+      LISTENING - Cлушает
+      WATCHING - Cмотрит
     */
     console.log("Запуск!");
   });
@@ -87,16 +88,17 @@ client.on("messageCreate", async message => {
     /*
       Модерация
     */
-    
+
     const ModeratorBot = require("discord-moderator");
     client.moderator = new ModeratorBot(client);
-    
+
     const member = message.mentions.members.last() || message.member.id; // Участник
     const reason = args.slice(1).join(" "); // Причина
     const role = message.mentions.roles.last() || message.guild.roles.id || args.join(" "); // Роль
     const roleAdd = message.mentions.roles.last() || args.slice(1).join(" ");
-    
-    if (cmd === "warn") { // Выдавать предупреждения пользователю
+
+    if (cmd === "warn") {
+      // Выдавать предупреждения пользователю
       if (!message.member.permissions.has("BAN_MEMBERS") || !message.member.permissions.has("KICK_MEMBERS")) {
         return message.channel.send("У вас нет прав [Банить или Кикать]");
       } else if (!member) {
@@ -132,8 +134,9 @@ client.on("messageCreate", async message => {
           return message.channel.send(res.text)
         })
       })
-      
-    } else if (cmd === "unwarn") { // Убрать предупреждение у пользователя
+
+    } else if (cmd === "unwarn") {
+      // Убрать предупреждение у пользователя
       if (!message.member.permissions.has("BAN_MEMBERS") || !message.member.permissions.has("KICK_MEMBERS")) {
         return message.channel.send("У вас нет прав [Банить или Кикать]");
       } else if (!member) {
@@ -164,8 +167,9 @@ client.on("messageCreate", async message => {
           return message.channel.send(res.text)
         })
       })
-      
-    } else if (cmd === "warns") { // Просмотр предупреждений у пользователя
+
+    } else if (cmd === "warns") {
+      // Просмотр предупреждений у пользователя
       if (!message.member.permissions.has("BAN_MEMBERS") || !message.member.permissions.has("KICK_MEMBERS")) {
         return message.channel.send("У вас нет прав [Банить или Кикать]");
       } else if (!member) {
@@ -193,8 +197,9 @@ client.on("messageCreate", async message => {
           return message.channel.send(res.text)
         })
       })
-      
-    } else if (cmd === "role") { // Информация о роли
+
+    } else if (cmd === "role") {
+      // Информация о роли
       if (!message.member.permissions.has("MANAGE_ROLES")) {
         return message.channel.send("У вас нет прав [Управление ролями]");
       } else if (!role) {
@@ -205,7 +210,7 @@ client.on("messageCreate", async message => {
         if (!data.status) {
           return message.channel.send("Роль не найдена");
         }
-        
+
         const role = new Discord.MessageEmbed()
           .setTitle("О роли")
           .setColor("BLACK")
@@ -234,17 +239,18 @@ client.on("messageCreate", async message => {
           return message.channel.send(res.text)
         })
       })
-      
-    } else if (cmd === "roles") { // Вывести все роли
+
+    } else if (cmd === "roles") {
+      // Вывести все роли
       if (!message.member.permissions.has("MANAGE_ROLES")) {
         return message.channel.send("У вас нет прав [Управление ролями]");
       }
-      
+
       client.moderator.roles.getAll(message.guild).then(data => {
         const roles = new Discord.MessageEmbed()
           .setTitle("Все роли")
           .setColor("BLACK")
-          .setDescription( data.map( role => `\`${role.name}\`` ).join(", ") )
+          .setDescription(data.map(role => `\`${role.name}\``).join(", "))
         return message.channel.send({
           embeds: [roles]
         })
@@ -256,8 +262,9 @@ client.on("messageCreate", async message => {
           return message.channel.send(res.text)
         })
       })
-      
-    } else if (cmd === "addrole") { // Добавить роль участнику
+
+    } else if (cmd === "addrole") {
+      // Добавить роль участнику
       if (!message.member.permissions.has("MANAGE_ROLES")) {
         return message.channel.send("У вас нет прав [Управление ролями]");
       } else if (!member) {
@@ -293,106 +300,64 @@ client.on("messageCreate", async message => {
           return message.channel.send(res.text)
         })
       })
-      
-    } else if (cmd === "delrole") { // Убрать роль участнику
+
+
+    } else if (cmd === "delrole") {
+      // Убрать роль участнику
       if (!message.member.permissions.has("MANAGE_ROLES")) {
         return message.channel.send("У вас нет прав [Управление ролями]");
       } else if (!member) {
         return message.channel.send("Укажите пользователя для снятия роли");
       } else if (!role) {
         return message.channel.send("Укажите роль для снятия");
-      } else if (reason) {
-        client.moderator.roles.remove(member, role, reason).then(data => {
-          const delRoleReason = new Discord.MessageEmbed()
-            .setTitle("Снятие роли")
-            .setColor("BLACK")
-            .addFields(
-              {
-                name: "Выполнил:", value: `${message.author}`
-              },
-              {
-                name: "Для пользователя:", value: `${member}`
-              },
-              {
-                name: "Роль:", value: `${role}`
-              },
-              {
-                name: "Причина:", value: `${reason}`
-              },
-            )
-            .setTimestamp()
-          return message.channel.send({
-            embeds: [delRoleReason]
-          });
-        })
-      } else if (!reason) {
-        client.moderator.roles.remove(member, role).then(data => {
-          const delRole = new Discord.MessageEmbed()
-            .setTitle("Снятие роли")
-            .setColor("BLACK")
-            .addFields(
-              {
-                name: "Выполнил:", value: `${message.author}`
-              },
-              {
-                name: "Для пользователя:", value: `${member}`
-              },
-              {
-                name: "Роль:", value: `${role}`
-              },
-              {
-                name: "Причина:", value: "Отсутствует"
-              },
-            )
-            .setTimestamp()
-          return message.channel.send({
-            embeds: [delRole]
-          });
-        }).catch(err => {
-          translate(`${err.message}`, {
-            from: "en",
-            to: "ru"
-          }).then(res => {
-            return message.channel.send(res.text)
-          })
-        })
       }
-    }
 
-    /*
-      Общее
-    */
+      client.moderator.roles.remove(member, role).then(data => {
+        const delRole = new Discord.MessageEmbed()
+          .setTitle("Снятие роли")
+          .setColor("BLACK")
+          .addFields(
+            {
+              name: "Выполнил:", value: `${message.author}`
+            },
+            {
+              name: "Для пользователя:", value: `${member}`
+            },
+            {
+              name: "Роль:", value: `${role}`
+            },
+          )
+          .setTimestamp()
+        return message.channel.send({
+          embeds: [delRole]
+        });
+      }).catch(err => {
+        translate(`${err.message}`, {
+          from: "en",
+          to: "ru"
+        }).then(res => {
+          return message.channel.send(res.text)
+        })
+      })
+    } else if (cmd === "announce") {
+      if (!message.member.permissions.has("MANAGE_MESSAGES")) {
+        return message.channel.send("У вас нет прав [Управление сообщениями]");
+      } else if (!args[0]) {
+        return message.channel.send("Введите объявление")
+      }
 
-    if (cmd === "help") {
-      const help = new Discord.MessageEmbed()
-        .setTitle("Список команд")
-        .setColor("#00ff00")
-        .setFields(
-          {
-            name: "Основные", value: `w.avatar — Посмотреть аватар пользователя\nw.invite — Пригласить бота на сервер\nw.anime — Узнать информацию об аниме\nw.bot-info — Информация о боте`
-          },
-          {
-            name: "Развлекательные", value: `w.coins — Подбросить монетку\nw.8ball — Задать вопрос магическому шару`
-          },
-          /*{
-            name: "Музыкальные", value: `w.play — Включить музыку\nw.skip — Пропуск трека\nw.lyrics — Текст песни\nw.queue — Добавить в очередь\nw.filter — Установить фильтр\nw.join — Подключение к голосовому каналу\nw.leave — Отключить от голосового канала`
-          },*/
-          {
-            name: "Модерация", value: `w.warn — Выдать предупреждение\nw.unwarn — Снять предупреждение\nw.warns — Просмотр предупреждений\nw.clear — Удалить сообщения\nw.say — Написать от лица бота\nw.announce — Сделать объявление`
-          },
-        )
+      const announce = new Discord.MessageEmbed()
+        .setTitle("Объявление")
+        .setDescription(args.join(" "))
+        .setColor("BLACK")
         .setFooter({
-          text: `${client.user.tag}`
+          text: `Объявлено: ${message.author.tag}`
         })
         .setTimestamp()
+      message.delete()
       message.channel.send({
-        embeds: [help]
+        embeds: [announce]
       })
-
-    } else if (cmd === "ping") {
-      const timeTaken = Date.now() - message.createdTimestamp;
-      let gatewayLatency = Math.floor(client.ws.ping);
-      message.channel.send(`Ping: \`${timeTaken}ms\`\nApi: \`${gatewayLatency}ms\``);
     } else if (cmd === "clear") {
       if (!message.member.permissions.has("MANAGE_MESSAGES")) {
         return message.channel.send("У вас нет прав [Управление сообщениями]");
@@ -414,7 +379,45 @@ client.on("messageCreate", async message => {
           message.channel.send(`Удалено ${args} сообщений!`)
         })
       };
+
       __delete();
+    }
+
+    /*
+      Общее
+    */
+
+    if (cmd === "help") {
+      message.channel.send("В разработке..")
+      /*const help = new Discord.MessageEmbed()
+        .setTitle("Список команд")
+        .setColor("#00ff00")
+        .setFields(
+          {
+            name: "Основные", value: `w.avatar — Посмотреть аватар пользователя\nw.invite — Пригласить бота на сервер\nw.anime — Узнать информацию об аниме\nw.bot-info — Информация о боте`
+          },
+          {
+            name: "Развлекательные", value: `w.coins — Подбросить монетку\nw.8ball — Задать вопрос магическому шару`
+          },
+          /*{
+            name: "Музыкальные", value: `w.play — Включить музыку\nw.skip — Пропуск трека\nw.lyrics — Текст песни\nw.queue — Добавить в очередь\nw.filter — Установить фильтр\nw.join — Подключение к голосовому каналу\nw.leave — Отключить от голосового канала`
+          },*/
+      /*{
+        name: "Модерация", value: `w.warn — Выдать предупреждение\nw.unwarn — Снять предупреждение\nw.warns — Просмотр предупреждений\nw.clear — Удалить сообщения\nw.say — Написать от лица бота\nw.announce — Сделать объявление`
+      },
+    )
+    .setFooter({
+      text: `${client.user.tag}`
+    })
+    .setTimestamp()
+  message.channel.send({
+    embeds: [help]
+  })*/
+
+    } else if (cmd === "ping") {
+      const timeTaken = Date.now() - message.createdTimestamp;
+      let gatewayLatency = Math.floor(client.ws.ping);
+      message.channel.send(`Ping: \`${timeTaken}ms\`\nApi: \`${gatewayLatency}ms\``);
     } else if (cmd === "coins") {
       const random = Math.floor(Math.random() * 4) + 1;
       message.channel.send("> Монета подбрасывается...");
@@ -450,19 +453,6 @@ client.on("messageCreate", async message => {
 
       let result = replyes[Math.floor(Math.random() * replyes.length)]
       message.channel.send(`${result}`)
-    } else if (cmd === "avatar") {
-      let user = message.author
-      if (message.mentions.members.size >= 1) {
-        user = message.mentions.members.first().user
-      }
-
-      const avatar = new Discord.MessageEmbed()
-        .setColor("#00ff00")
-        .setTitle(`Аватар пользователя \n${user.username}`)
-        .setImage(user.displayAvatarURL({ dynamic: true }))
-      message.channel.send({
-        embeds: [avatar]
-      });
     } else if (cmd === "invite") {
       const embed = new Discord.MessageEmbed()
         .setAuthor({
@@ -505,47 +495,221 @@ client.on("messageCreate", async message => {
       console.log("Перезагрузка!")
       process.exit()
     } else if (cmd === "server-info") {
-      let verifilv = ["Отсутствует", "Низкий", "Средний", "Высокий", "Очень высокий"]
-      let serverinfo = new Discord.MessageEmbed()
-        .setAuthor({
-          name: message.guild.name,
-          iconURL: message.guild.iconURL
-        })
-        .setThumbnail(message.guild.iconURL)
-        .setTitle("👑 Информация о сервере 👑")
-        .setColor("#00ff00")
+      const filterLevels = {
+        DISABLED: "Выключено",
+        MEMBERS_WITHOUT_ROLES: "Без ролей",
+        ALL_MEMBERS: "Всех участников"
+      };
+
+      const verificationLevels = {
+        NONE: "Отсутствует",
+        LOW: "Низкий",
+        MEDIUM: "Средний",
+        HIGH: "(╯°□°）╯︵ ┻━┻",
+        VERY_HIGH: "┻━┻ ﾐヽ(ಠ益ಠ)ノ彡┻━┻"
+      };
+
+      const regions = {
+        brazil: "Бразилия",
+        europe: "Европа",
+        hongkong: "Гонконг",
+        india: "Индия",
+        japan: "Япония",
+        russia: "Россия",
+        singapore: "Сингапур",
+        southafrica: "Южная Африка",
+        sydeny: "Сидней",
+        "us-central": "Центральная Америка",
+        "us-east": "Восточная Америка",
+        "us-west": "Западная Америка",
+        "us-south": "Южная Америка"
+      };
+      
+      const serverInfo = new Discord.MessageEmbed()
+        .setTitle(`Информация о сервере ${message.guild.name}`)
+        .setThumbnail(message.guild.iconURL({ dynamic: true }))
+        .setColor("GREEN")
         .addFields(
-          {
-            name: "🌟 Владелец:", value: message.guild.owner
-          },
-          {
-            name: "🏳️ Регион:", value: message.guild.region
-          },
-          {
-            name: "🌠 Участники:", value: `${message.guild.presences.size} в сети\n${message.guild.memberCount} всего`
-          },
           /*{
-            name: "⚙️ Каналы:", value: `${message.guild.channels(c => c.type == "text").size} текстовых\n${message.guild.channels(c => c.type == "voice").size} голосовых`
+            name: "🌟 Владелец:", value: `${message.guild.owner.user.tag}`
           },*/
           {
-            name: "♻️ Уровень проверки:", value: verifilv[message.guild.verificationLevel]
+            name: "Участники:", value: `Всего: ${message.guild.memberCount}\nПользователей: ${message.guild.members.cache.filter(member => !member.user.bot).size}\nБотов: ${message.guild.members.cache.filter(member => member.user.bot).size}`, inline: true
+          },
+          /*{
+            name: "Статусы:",
+            value: `В сети: ${message.member.presence.status === "online".size}\n
+              Неактивен: ${message.member.presence.status === "idle".size}\n
+              Не беспокоить: ${message.member.presence.status === "dnd".size}\n
+              Не в сети: ${message.member.presence.status === "offline".size}`, inline: true
+          },*/
+          {
+            name: "Каналы:", value: `${message.guild.channels.cache.filter(c => c.type == "text").size} текстовых\n${message.guild.channels.cache.filter(c => c.type == "voice").size} голосовых`, inline: true
           },
           {
-            name: "♾️ Ролей:", value: message.guild.roles.size
+            name: "Бусты",
+            value: `Уровень: ${message.guild.premiumTier ? `${message.guild.premiumTier}` : "Отсутствует"}\nКол-во: ${message.guild.premiumSubscriptionCount || "0"}`,
+            inline: true
           },
           {
-            name: "😀 Эмодзи:", value: message.guild.emojis.size
+            name: "Регион:", value: `${regions[message.guild.region]}`, inline: true
+          },
+          {
+            name: "Уровень проверки:", value: `${verificationLevels[message.guild.verificationLevel]}`, inline: true
+          },
+          {
+            name: "Фильтрация медиаконтента:", value: `${filterLevels[message.guild.explicitContentFilter]}`, inline: true
+          },
+          {
+            name: "Ролей:", value: `${message.guild.roles.cache.sort((a, b) => b.position - a.position).map(role => role.toString()).length}`, inline: true
+          },
+          /*{
+            name: "Эмодзи:", value: `${message.guild.emojis.cache.size} всего, из них ${emojis.filter(emoji => !emoji.animated).size} обычных и ${emojis.filter(emoji => emoji.animated).size} анимированных`, inline: true
+          },*/
+        )
+        .setFooter({
+          text: `🆔: ${message.guild.id} | Сервер создан:`
+        })
+        .setTimestamp(`${moment(message.guild.createdTimestamp).format("LT")} ${moment(message.guild.createdTimestamp).format("LL")} ${moment(message.guild.createdTimestamp).fromNow()}`)
+      message.channel.send({
+        embeds: [serverInfo]
+      })
+    } else if (cmd === "user-info") {
+      const userInfo = new Discord.MessageEmbed()
+        .setTitle(`Информация о ${message.member.displayName}#${message.member.user.discriminator}`)
+        .setThumbnail(message.member.displayAvatarURL())
+        .setColor("#ff00ff")
+        .addFields(
+          {
+            name: "Никнейм:", value: `${message.member.displayName}`, inline: true
+          },
+          {
+            name: "Роли:", value: `${Array.from(message.member.roles.cache.mapValues(roles => roles.name).values()).join(", ") || "Отсутствуют"}`, inline: true
+          },
+          {
+            name: "Дата входа на сервер:", value: `${message.member.joinedAt}`, inline: true
+          },
+          {
+            name: "Статус:", value: `${message.member.presence? message.member.presence.status : "offline"}`, inline: true
           },
         )
         .setFooter({
-          text: `🆔 Сервера: ${message.guild.id} | Сервер создан:`
+          text: `🆔: ${message.member.id} | Аккаунт создан:`
         })
-        .setTimestamp(new Date(message.guild.createdTimestamp))
-      message.channel.send({
-        embeds: [serverinfo]
-      })
+        .setTimestamp(`${message.member.user.createdAt}`)
+      return message.channel.send({
+        embeds: [userInfo]
+      });
+    } else if (cmd === "channel-info") {
+      const channel = message.mentions.channels.first() || client.guilds.cache.get(message.guild.id).channels.cache.get(args[0]) || message.guild.channels.cache.find(r => r.name.toLowerCase() === args.join(" ").toLocaleLowerCase()) || message.channel;
+      const channelType = {
+        GUILD_TEXT: "Текстовой",
+        UILD_VOICE: "Голосовой",
+        GUILD_NEWS: "Новостной"
+      }
+      if (!channel) {
+        return message.channel.send("Канал не найден");
+      }
 
-    } else if (cmd === "anime") {
+      const channelInfo = new Discord.MessageEmbed()
+        .setTitle(`Информация о канале ${channel.name}`)
+        .setThumbnail(message.guild.iconURL())
+        .setColor("GREEN")
+        .addFields(
+          {
+            name: "Описание", value: `${channel.topic || "Нет описания"}`
+          },
+          {
+            name: "Тип", value: `${channelType[channel.type]}`
+          },
+          {
+            name: "NSFW", value: `${channel.nsfw}`
+          },
+        )
+        .setFooter({
+          text: `🆔: ${channel.id} | Канал создан:`
+        })
+        .setTimestamp(`${channel.createdAt}`)
+      message.channel.send({
+        embeds: [channelInfo]
+      });
+    } else if (cmd === "voice-info") {
+      if (!message.guild.me.voiceChannel) {
+        return message.channel.send("Зайдите в голосовой канал")
+      } else if (message.guild.me.voiceChannel) {
+        const voiceInfo = new Discord.MessageEmbed()
+          .setTitle(`Информация о канале ${message.guild.me.voiceChannel.name}`)
+          .setThumbnail(message.guild.iconURL())
+          .setColor("#00ff00")
+          .addField("Пользовательских слотов:", `${message.guild.me.voiceChannel.userLimit}`)
+          .setFooter({
+            text: `🆔: ${message.guild.me.voiceChannel.id} | Канал создан:`
+          })
+          .setTimestamp(`${moment().format("dddd, MMMM, YYYY, h:mm A", message.guild.me.voiceChannel.createdAt)}`)
+        message.channel.send({
+          embeds: [voiceInfo]
+        })
+      } else {
+        message.channel.send("Не могу подключиться к голосовому каналу")
+      }
+    } else if (cmd === "bot-info") {
+      const botInfo = new Discord.MessageEmbed()
+        .setTitle(`👑 Информация о ${client.user.tag} 👑`)
+        .setColor("#ff00ff")
+        .setThumbnail(client.user.displayAvatarURL({ dynamic: true }))
+        .addFields(
+          {
+            name: "Время безотказной работы", value: `${ms(client.uptime)}`
+          },
+          {
+            name: "Пинг веб-сокета", value: `${client.ws.ping}ms`
+          },
+          {
+            name: "Память", value: `${(process.memoryUsage().rss / 1024 / 1024).toFixed(2)} MB RSS\n${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB Heap`
+          },
+          {
+            name: "Серверов", value: `${client.guilds.cache.size}`
+          },
+          {
+            name: "Пользователей", value: `${client.users.cache.size}`
+          },
+          {
+            name: "Эмодзи", value: `${client.emojis.cache.size}`
+          },
+          {
+            name: "Node", value: `${process.version} в ${process.platform} ${process.arch}`
+          },
+        )
+      message.channel.send({
+        embeds: [botInfo]
+      })
+    }
+
+    /*
+      Ролевые
+    */
+
+    const superagent = require("superagent");
+    
+    if (cmd === "hug") {
+      let victim = message.mentions.users.first() || (args.length > 0 ? message.users.cache.filter(e => e.username.toLowerCase().includes(args.join(" ").toLowerCase())).first(): message.author) || message.author;
+      let body = superagent.get("https://nekos.life/api/v2/img/hug")
+      const hug = new Discord.MessageEmbed()
+        .setTitle("Обнимашки ^^")
+        .setColor("#ff5500")
+        .setDescription(`${victim} находится в объятиях с ${message.author}`)
+        .setImage(body.url)
+        .setTimestamp()   
+      message.channel.send({
+        embeds: [hug]  
+      });
+    }
+
+    /*
+      Дополнительные
+    */
+
+    if (cmd === "anime") {
       const malScraper = require("mal-scraper");
       const search = `${args}`
 
@@ -557,7 +721,7 @@ client.on("messageCreate", async message => {
         const anime = new Discord.MessageEmbed()
           .setAuthor(`Результаты поиска ${args}`.split(",").join(" "))
           .setThumbnail(data.picture)
-          .setColor("#00ff00")
+          .setColor("#00ffff")
           .addFields(
             {
               name: "Английское название:", value: data.englishTitle
@@ -595,52 +759,54 @@ client.on("messageCreate", async message => {
           embeds: [anime]
         })
       })
-
-    } else if (cmd === "announce") {
-      if (!message.member.permissions.has("MANAGE_MESSAGES")) {
-        return message.channel.send("У вас нет прав [Управление сообщениями]");
-      } else if (!args[0]) {
-        return message.channel.send("Введите объявление")
-      }
-
-      const announce = new Discord.MessageEmbed()
-        .setTitle("Объявление")
-        .setDescription(args.join(" "))
-        .setColor("#00ff00")
-        .setFooter({
-          text: `Объявлено: ${message.author.tag}`
-        })
-        .setTimestamp()
-      message.delete()
-      message.channel.send({
-        embeds: [announce]
-      })
-
-    } else if (cmd === "bot-info") {
-      const botinfo = new Discord.MessageEmbed()
-        .setTitle("👑 Информация о боте 👑")
-        .setColor("#00ff00")
-        .setDescription("Функциональный бот для любого сервера")
-        .addFields(
-          {
-            name: "🌟 Создатель бота", value: "Wynne#5531"
-          },
-          {
-            name: "🔥 Название бота", value: `${client.user.tag}`
-          },
-          {
-            name: "💫 Бот создан", value: `${moment.utc(client.user.createdAt).format("dddd, MMMM Do YYYY")} (${ms(Date.now() - client.user.createdAt, { long: true })})`
-          },
-        )
-        .setFooter({
-          text: "🆔: 700643975043743827"
-        })
-        .setTimestamp();
-      message.channel.send({
-        embeds: [botinfo]
-      })
     }
 
+    /*
+      Манипуляция с изображениями
+    */
+
+    if (cmd === "avatar") {
+      let user = message.author
+      let Member = message.mentions.users.first() || message.author;
+
+      if (message.mentions.members.size >= 1) {
+        user = message.mentions.members.first().user
+      }
+
+      const avatar = new Discord.MessageEmbed()
+        .setColor("#00ffff")
+        .setTitle(`Аватар пользователя \n${user.username}`)
+        .addField(
+          "Ссылки",
+          `[PNG](${Member.displayAvatarURL({
+            format: "png",
+            dynamic: true
+          })}) | [JPG](${Member.displayAvatarURL({
+            format: "jpg",
+            dynamic: true
+          })}) | [WEBP](${Member.displayAvatarURL({
+            format: "webp",
+            dynamic: true
+          })})`
+        )
+        .setImage(user.displayAvatarURL({ dynamic: true }))
+      message.channel.send({
+        embeds: [avatar]
+      });
+    } else if (cmd === "minecraft") {
+      const argsMinecraft = args.join("+")
+      if (!argsMinecraft) {
+        return message.channel.send("Введите название достижения")
+      }
+
+      const minecraft = new Discord.MessageEmbed()
+        .setTitle("Minecraft достижение!")
+        .setColor("#00ffff")
+        .setImage(`https://minecraftskinstealer.com/achievement/12/Achievement%20Get!/${argsMinecraft}`);
+      message.channel.send({
+        embeds: [minecraft]
+      });
+    }
   } catch (e) {
     console.log(e)
   }
