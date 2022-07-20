@@ -1,4 +1,4 @@
-node_modules
 .replit
+node_modules
 replit.nix
 json.sqlite
