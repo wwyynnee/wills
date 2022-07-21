@@ -524,7 +524,7 @@ client.on("messageCreate", async message => {
         "us-west": "Западная Америка",
         "us-south": "Южная Америка"
       };
-      
+
       const serverInfo = new Discord.MessageEmbed()
         .setTitle(`Информация о сервере ${message.guild.name}`)
         .setThumbnail(message.guild.iconURL({ dynamic: true }))
@@ -590,7 +590,7 @@ client.on("messageCreate", async message => {
             name: "Дата входа на сервер:", value: `${message.member.joinedAt}`, inline: true
           },
           {
-            name: "Статус:", value: `${message.member.presence? message.member.presence.status : "offline"}`, inline: true
+            name: "Статус:", value: `${message.member.presence ? message.member.presence.status : "offline"}`, inline: true
           },
         )
         .setFooter({
@@ -690,18 +690,18 @@ client.on("messageCreate", async message => {
     */
 
     const superagent = require("superagent");
-    
+
     if (cmd === "hug") {
-      let victim = message.mentions.users.first() || (args.length > 0 ? message.users.cache.filter(e => e.username.toLowerCase().includes(args.join(" ").toLowerCase())).first(): message.author) || message.author;
+      let victim = message.mentions.users.first() || (args.length > 0 ? message.users.cache.filter(e => e.username.toLowerCase().includes(args.join(" ").toLowerCase())).first() : message.author) || message.author;
       let body = superagent.get("https://nekos.life/api/v2/img/hug")
       const hug = new Discord.MessageEmbed()
         .setTitle("Обнимашки ^^")
         .setColor("#ff5500")
         .setDescription(`${victim} находится в объятиях с ${message.author}`)
         .setImage(body.url)
-        .setTimestamp()   
+        .setTimestamp()
       message.channel.send({
-        embeds: [hug]  
+        embeds: [hug]
       });
     }
 
