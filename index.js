@@ -3,6 +3,7 @@ const moment = require("moment");
 const ms = require("ms");
 
 const prefix = process.env.prefix;
+const token = process.env.token;
 
 const client = new Discord.Client({
   intents: ["GUILDS", "GUILD_MESSAGES", "GUILD_VOICE_STATES"]
@@ -12,35 +13,32 @@ const keepAlive = require("./server");
 
 //ready
 try {
-  client.on("ready", () => {
-    client.user.setPresence({
-      activities: [{
-        name: "w.help",
-        type: "WATCHING"
-      }],
-      status: "idle"
-    });
-    /*
-      online - В сети
-      idle - Неактивен
-      dnd - Не беспокоить
-    */
-    /*
-      PLAYING - Играет
-      STREAMING - Cтримит
-      LISTENING - Cлушает
-      WATCHING - Cмотрит
-    */
-    console.log("Запуск!");
-  });
+  try {
+    client.on("ready", async () => {
+      client.user.setPresence({
+        activities: [{
+          name: "w.help",
+          type: "WATCHING"
+        }],
+        status: "dnd"
+      });
+      console.log("Запуск!");
+    })
+  } catch (e) {
+    console.log("Что-то пошло не так при запуске!")
+  }
 
-  client.on("guildCreate", guild => {
-    const channels = guild.channels.cache.filter(channel => channel.type == "text");
-
-    channels.first().send("Спасибо за приглашение!").catch(err => {
-      console.error(err)
-    });
-  })
+  try {
+    client.on("guildCreate", guild => {
+      const channels = guild.channels.cache.filter(channel => channel.type == "text");
+  
+      channels.first().send("Спасибо за приглашение!").catch(err => {
+        console.error(err)
+      });
+    })
+  } catch (e) {
+    console.log("Что-то пошло не так при создании текст-приглашения")
+  }
 } catch (e) {
   console.log(e)
 }
@@ -197,7 +195,74 @@ client.on("messageCreate", async message => {
           return message.channel.send(res.text)
         })
       })
-
+    } else if (cmd === "kick") {
+      if (!message.member.permissions.has("KICK_MEMBERS")) {
+        return message.channel.send("У вас нет прав [Выгонять участников]");
+      } else if (!member) {
+        return message.channel.send("Укажите пользователя");
+      } else if (!reason) {
+        return message.channel.send("Укажите причину для кика");
+      }
+  
+      client.moderator.punishments.kick(member, reason, message.author.id).then(data => {
+        const kick = new Discord.MessageEmbed()
+          .setTitle("Кик")
+          .setColor("BLACK")
+          .addFields(
+            {
+              name: "Выдал:", value: `${message.author}`
+            },
+            {
+              name: "Нарушитель:", value: `${member}`
+            },
+            {
+              name: "Причина:", value: `${reason}`
+            },
+          )
+          .setTimestamp()
+        message.channel.send({ embeds: [kick] })
+      }).catch(err => {
+        translate(`${err.message}`, {
+          from: "en",
+          to: "ru"
+        }).then(res => {
+          return message.channel.send(res.text)
+        })
+      })
+    } else if (cmd === "ban") {
+      if (!message.member.permissions.has("BAN_MEMBERS")) {
+        return message.channel.send("У вас нет прав [Блокировать участников]");
+      } else if (!member) {
+        return message.channel.send("Укажите пользователя");
+      } else if (!reason) {
+        return message.channel.send("Укажите причину для бана");
+      }
+  
+      client.moderator.punishments.ban(member, reason, message.author.id).then(data => {
+        const ban = new Discord.MessageEmbed()
+          .setTitle("Бан")
+          .setColor("BLACK")
+          .addFields(
+            {
+              name: "Выдал:", value: `${message.author}`
+            },
+            {
+              name: "Нарушитель:", value: `${member}`
+            },
+            {
+              name: "Причина:", value: `${reason}`
+            },
+          )
+          .setTimestamp()
+        message.channel.send({ embeds: [ban] })
+      }).catch(err => {
+        translate(`${err.message}`, {
+          from: "en",
+          to: "ru"
+        }).then(res => {
+          return message.channel.send(res.text)
+        })
+      })
     } else if (cmd === "role") {
       // Информация о роли
       if (!message.member.permissions.has("MANAGE_ROLES")) {

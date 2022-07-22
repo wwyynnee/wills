@@ -10,8 +10,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@discordjs/builders": "^1.0.0",
+    "@discordjs/rest": "^1.0.0",
     "@vitalets/google-translate-api": "^8.0.0",
     "clever-bot-api": "^1.5.4",
+    "discord-api-types": "^0.36.3",
     "discord-moderator": "^1.1.6",
     "discord.js": "^13.8.1",
     "express": "^4.18.1",
