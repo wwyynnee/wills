@@ -1,6 +1,6 @@
 const Discord = require("discord.js");
 
-module.exports = {
+module.exports={
 	name: "ping",
 	description: "Посмотреть пинг веб-сокета",
 	async run(client,message,args) {
