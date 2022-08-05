@@ -12,7 +12,6 @@
     "api",
     "alexa"
   ],
-  "author": "BlobKat#1337",
   "license": "MIT",
   "dependencies": {
     "md5": "^2.3.0",

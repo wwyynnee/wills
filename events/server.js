@@ -7,10 +7,12 @@ server.all("/", (req, res) => {
 })
 
 server.listen(3000, () => {
-    console.log("Сервер готов")
+  console.log("Сервер готов")
 })
 
-module.exports={
-  run: ()=>{message="Бот запущен!"},
+module.exports= {
+  run: () => {
+    message = "Бот запущен!"
+  },
   event: "ready"
 }

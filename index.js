@@ -7,11 +7,16 @@ client.commands = new Discord.Collection();
 const prefix = process.env.prefix;
 const token = process.env.token;
 
-fs.readdir("cmds", (err, files) => {
-  files = files.filter(i => i.endsWith(".js"));
-  files.map(file => {
-    let command = require("./cmds/" + file);
-    client.commands.set(command.name, command);
+fs.readdir("./cmds", (err, dirs) => {
+  dirs = dirs.filter(i => fs.lstatSync("./cmds/" + i).isDirectory());
+  dirs.map(dir => {
+    fs.readdir("./cmds/" + dir, (err, files) => {
+      files = files.filter(i => i.endsWith(".js"));
+      files.map(file => {
+        let command = require("./cmds/" + dir + "/" + file);
+        client.commands.set(command.name, command);
+      })
+    })
   })
 })
 

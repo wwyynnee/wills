@@ -10,7 +10,7 @@ module.exports = {
         return message.channel.send("В данном канале нельзя использовать мои команды");
       } else if (message.author.bot == false) {
         translate(`${args}`, { to: "en" }).then(res => {
-          ai(res.text, "fake-session").then(async res => {
+          ai(res.text).then(async res => {
             if (res) {
               translate(res, {
                 from: "en", to: "ru"
