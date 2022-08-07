@@ -1,5 +1,4 @@
 const Discord = require("discord.js");
-const translate = require("@vitalets/google-translate-api");
 
 module.exports = {
   name: "minecraft",
