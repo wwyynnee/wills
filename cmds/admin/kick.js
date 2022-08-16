@@ -3,29 +3,25 @@ const ModeratorBot = require("discord-moderator");
 const translate = require("@vitalets/google-translate-api");
 
 module.exports = {
-  name: "warn",
-  description: "Выдать предупреждение",
+  name: "kick",
+  description: "Выгнать участника",
   async run(client, message, args) {
     client.moderator = new ModeratorBot(client);
 
     const member = message.mentions.members.last() || message.member.id;
     const reason = args.slice(1).join(" ");
-
-    if (!message.member.permissions.has("BAN_MEMBERS") || !message.member.permissions.has("KICK_MEMBERS")) {
-      return message.channel.send("У вас нет прав [Банить или Кикать]")
-    } else if (!args[0]) {
-      if (!member) {
-        return message.channel.send("Укажите пользователя");
-      }
-    } else if (!args[1]) {
-      if (!reason) {
-        return message.channel.send("Укажите причину для предупреждения");
-      }
+    
+    if (!message.member.permissions.has("KICK_MEMBERS")) {
+      return message.channel.send("У вас нет прав [Выгонять участников]");
+    } else if (!member) {
+      return message.channel.send("Укажите пользователя");
+    } else if (!reason) {
+      return message.channel.send("Укажите причину для кика");
     }
 
-    client.moderator.warns.add(member, message.channel, reason, message.author.id, "999999999999999999").then(data => {
-      const warn = new Discord.MessageEmbed()
-        .setTitle("Предупреждение")
+    client.moderator.punishments.kick(member, reason, message.author.id).then(data => {
+      const kick = new Discord.MessageEmbed()
+        .setTitle("Кик")
         .setColor("BLACK")
         .addFields(
           {
@@ -39,9 +35,7 @@ module.exports = {
           },
         )
         .setTimestamp()
-      return message.channel.send({
-        embeds: [warn]
-      });
+      message.channel.send({ embeds: [kick] })
     }).catch(err => {
       translate(`${err.message}`, {
         from: "en",
