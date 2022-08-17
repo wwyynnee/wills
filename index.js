@@ -8,24 +8,6 @@ client.commands = new Discord.Collection();
 const prefix = process.env.prefix;
 const token = process.env.token;
 
-const clientId = "980103023034527865";
-const { REST } = require("@discordjs/rest");
-const rest = new REST({ version: "10" }).setToken(token);
-(async () => {
-	try {
-		console.log("Запустились слэш-команды");
-
-		await rest.put(
-			Discord.Routes.applicationGuildCommands(clientId),
-			{ body: commands },
-		);
-
-		console.log("Успешно перезагружены слэш-команды приложения");
-	} catch (error) {
-		console.error(error);
-	}
-})();
-
 fs.readdir("./cmds", (err, dirs) => {
   dirs = dirs.filter(i => fs.lstatSync("./cmds/" + i).isDirectory());
   dirs.map(dir => {
@@ -52,7 +34,7 @@ try {
   client.on("ready", async () => {
     client.user.setPresence({
       activities: [{
-        name: "я воскрес",
+        name: "в разработке..",
         type: "LISTENING"
       }],
       status: "dnd"
@@ -63,7 +45,7 @@ try {
   console.log(e)
 }
 
-client.on("messageCreate", async message => {
+client.on("messageCreate", async message => { 
   if (
     !message.content.startsWith(process.env.prefix) ||
     message.author.bot ||
