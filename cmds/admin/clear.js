@@ -20,6 +20,7 @@ module.exports = {
       await message.channel.messages.fetch({
         limit: args
       }).then(messages => {
+        message.delete()
         message.channel.bulkDelete(messages, true)
         message.channel.send(`Удалено ${args} сообщений!`)
       })

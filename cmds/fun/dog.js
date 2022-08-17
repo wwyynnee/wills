@@ -3,11 +3,11 @@ const translate = require("@vitalets/google-translate-api");
 const axios = require("axios");
 
 module.exports = {
-  name: "cat",
-  description: "Случайные картинки с котами",
+  name: "dog",
+  description: "Случайные картинки с собаками",
   async run(client, message, args) {
-    const url = "https://some-random-api.ml/img/cat"
-    const facts = "https://some-random-api.ml/facts/cat"
+    const url = "https://some-random-api.ml/img/dog"
+    const facts = "https://some-random-api.ml/facts/dog"
     
     let image, response, fact, responses
     
@@ -25,13 +25,13 @@ module.exports = {
     }
 
     translate(`${fact.fact}`, { to: "ru" }).then(res => {
-      const cat = new Discord.MessageEmbed()
-        .setTitle("Случайные котики OwO")
+      const dog = new Discord.MessageEmbed()
+        .setTitle("Случайные собачки UwU")
         .setColor("WHITE")
         .setURL(image.link)
         .setDescription(`${res.text}`)
         .setImage(image.link)
-      message.channel.send({ embeds: [cat] })
+      message.channel.send({ embeds: [dog] })
     })
   }
 }
