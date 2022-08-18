@@ -45,7 +45,65 @@ try {
   console.log(e)
 }
 
-client.on("messageCreate", async message => { 
+client.on("messageCreate", async message => {
+  const argsInterserver = message.content.slice().split(" ").join(" ");
+
+  //if (message.author.id == "1002291347102904440") return;
+
+  const channel1 = "1009765734987079742";
+  const channel2 = "1009723616188977152";
+  const channel3 = "1009687114570543144";
+
+  const interserver = new Discord.MessageEmbed()
+    .setAuthor({
+      name: `${message.author.username}`,
+      iconURL: `${message.author.displayAvatarURL({ dynamic: true })}`
+    })
+    .setColor("#03ffc8")
+    .setDescription( String(argsInterserver) )
+    .setFooter({ text: `С сервера ${message.guild.name}` })
+
+  const interserverError = new Discord.MessageEmbed()
+    .setTitle("Что-то пошло не так :/")
+    .setColor("RED")
+    .setDescription("Попробуйте снова через какое-то время или обратитесь к Wynne#5531")
+
+  switch (message.channel.id) {
+    case channel1:
+      if (message.content.indexOf(argsInterserver) <= 1) {
+        if (message.author.bot == false) {
+          client.channels.cache.get(channel2).send({ embeds: [interserver] })
+          client.channels.cache.get(channel3).send({ embeds: [interserver] })
+          message.react("<:send:1009721052429041735>")
+        }
+      } else {
+        message.reply({ embeds: [interserverError] })
+      }
+      break;
+    case channel2:
+      if (message.content.indexOf(argsInterserver) <= 1) {
+        if (message.author.bot == false) {
+          client.channels.cache.get(channel1).send({ embeds: [interserver] })
+          client.channels.cache.get(channel3).send({ embeds: [interserver] })
+          message.react("<:send:1009721052429041735>")
+        }
+      } else {
+        message.reply({ embeds: [interserverError] })
+      }
+      break;
+    case channel3:
+      if (message.content.indexOf(argsInterserver) <= 1) {
+        if (message.author.bot == false) {
+          client.channels.cache.get(channel2).send({ embeds: [interserver] })
+          client.channels.cache.get(channel1).send({ embeds: [interserver] })
+          message.react("<:send:1009721052429041735>")
+        }
+      } else {
+        message.reply({ embeds: [interserverError] })
+      }
+      break;
+  }
+
   if (
     !message.content.startsWith(process.env.prefix) ||
     message.author.bot ||
