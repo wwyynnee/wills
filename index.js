@@ -54,14 +54,26 @@ client.on("messageCreate", async message => {
   const channel2 = "1009723616188977152";
   const channel3 = "1009687114570543144";
 
+  //const interserverImage = new Discord.MessageAttachment();
+  
   const interserver = new Discord.MessageEmbed()
     .setAuthor({
       name: `${message.author.username}`,
       iconURL: `${message.author.displayAvatarURL({ dynamic: true })}`
     })
+    .setImage(`${message.attachments.size > 0 ? message.attachments.array() : null}`)
     .setColor("#03ffc8")
     .setDescription( String(argsInterserver) )
     .setFooter({ text: `С сервера ${message.guild.name}` })
+  
+  /*if (message.attachments) {
+    const buffer = fs.readFileSync('./memes.txt');
+    const attachment = new MessageAttachment(buffer, "img.txt");
+    const interserverImage = new Discord.MessageEmbed()
+      .setImage(`${attachment}`)
+      .setColor("#03ffc8")
+  }
+  message.channel.send({ embeds: [interserverImage] })*/
 
   const interserverError = new Discord.MessageEmbed()
     .setTitle("Что-то пошло не так :/")
@@ -72,8 +84,8 @@ client.on("messageCreate", async message => {
     case channel1:
       if (message.content.indexOf(argsInterserver) <= 1) {
         if (message.author.bot == false) {
-          client.channels.cache.get(channel2).send({ embeds: [interserver] })
-          client.channels.cache.get(channel3).send({ embeds: [interserver] })
+          client.channels.cache.get(channel2).send({ embeds: [interserver], files: [interserverImage] })
+          client.channels.cache.get(channel3).send({ embeds: [interserver], files: [interserverImage] })
           message.react("<:send:1009721052429041735>")
         }
       } else {
@@ -83,8 +95,8 @@ client.on("messageCreate", async message => {
     case channel2:
       if (message.content.indexOf(argsInterserver) <= 1) {
         if (message.author.bot == false) {
-          client.channels.cache.get(channel1).send({ embeds: [interserver] })
-          client.channels.cache.get(channel3).send({ embeds: [interserver] })
+          client.channels.cache.get(channel1).send({ embeds: [interserver], files: [interserverImage] })
+          client.channels.cache.get(channel3).send({ embeds: [interserver], files: [interserverImage] })
           message.react("<:send:1009721052429041735>")
         }
       } else {
@@ -94,8 +106,8 @@ client.on("messageCreate", async message => {
     case channel3:
       if (message.content.indexOf(argsInterserver) <= 1) {
         if (message.author.bot == false) {
-          client.channels.cache.get(channel2).send({ embeds: [interserver] })
-          client.channels.cache.get(channel1).send({ embeds: [interserver] })
+          client.channels.cache.get(channel2).send({ embeds: [interserver], files: [interserverImage] })
+          client.channels.cache.get(channel1).send({ embeds: [interserver], files: [interserverImage] })
           message.react("<:send:1009721052429041735>")
         }
       } else {
