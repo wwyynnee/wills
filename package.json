@@ -16,7 +16,7 @@
     "blobby-bot": "^1.0.35",
     "clever-bot-api": "^1.5.4",
     "discord-moderator": "^1.1.6",
-    "discord.js": "^13.10.2",
+    "discord.js": "^13.10.3",
     "express": "^4.18.1",
     "mal-scraper": "^2.11.4",
     "md5": "^2.3.0",
