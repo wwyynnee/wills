@@ -8,6 +8,29 @@ client.commands = new Discord.Collection();
 const prefix = process.env.prefix;
 const token = process.env.token;
 
+try {
+  client.on("ready", async () => {
+    console.log("Запуск!");
+    client.user.setPresence({
+      activities: [{
+        name: "w.help",
+        type: "LISTENING"
+      }],
+      status: "dnd"
+    });
+  })
+
+  client.on("disconnect", async () => {
+    console.log("Отключился!")
+  })
+  
+  client.on("reconnecting", async () => {
+    console.log("Переподключение!")
+  })
+} catch (e) {
+  console.log(e)
+}
+
 fs.readdir("./cmds", (err, dirs) => {
   dirs = dirs.filter(i => fs.lstatSync("./cmds/" + i).isDirectory());
   dirs.map(dir => {
@@ -30,22 +53,9 @@ fs.readdir("events", (err, files) => {
 })
 
 
-try {
-  client.on("ready", async () => {
-    client.user.setPresence({
-      activities: [{
-        name: "в разработке..",
-        type: "LISTENING"
-      }],
-      status: "dnd"
-    });
-    console.log("Запуск!");
-  })
-} catch (e) {
-  console.log(e)
-}
-
 client.on("messageCreate", async message => {
+  console.log("Загружены ивенты!")
+  
   const argsInterserver = message.content.slice().split(" ").join(" ");
 
   //if (message.author.id == "1002291347102904440") return;

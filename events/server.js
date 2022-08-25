@@ -10,7 +10,7 @@ server.listen(3000, () => {
   console.log("Сервер готов")
 })
 
-module.exports= {
+module.exports = {
   run: () => {
     message = "Бот запущен!"
   },

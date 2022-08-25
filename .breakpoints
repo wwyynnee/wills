@@ -3,9 +3,9 @@
     "cmds/economy/crime.js": [
       {
         "id": "03d5441b-8dda-4fe9-99e6-1a4cd60e947b",
-        "line": 37,
-        "version": 171,
-        "index": 1177
+        "line": 45,
+        "version": 195,
+        "index": 1512
       }
     ]
   }
