@@ -53,9 +53,7 @@ fs.readdir("events", (err, files) => {
 })
 
 
-client.on("messageCreate", async message => {
-  console.log("Загружены ивенты!")
-  
+client.on("messageCreate", async message => {  
   const argsInterserver = message.content.slice().split(" ").join(" ");
 
   //if (message.author.id == "1002291347102904440") return;
