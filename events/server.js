@@ -6,7 +6,7 @@ server.all("/", (req, res) => {
   res.send(message)
 })
 
-server.listen(3000, () => {
+server.listen(process.env.PORT, () => {
   console.log("Сервер готов")
 })
 
