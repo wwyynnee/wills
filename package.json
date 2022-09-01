@@ -2,7 +2,7 @@
   "name": "wills-discord",
   "version": "1.0.0",
   "description": "Awesome discord bot",
-  "main": "index.js",
+  "main": "/app/node_modules/quick.db/out/index.js",
   "scripts": {
     "start": "node index.js"
   },
