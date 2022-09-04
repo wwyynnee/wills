@@ -10,9 +10,7 @@ module.exports = {
 
     const member = message.mentions.members.last() || message.member.id;
 
-    if (!message.member.permissions.has("BAN_MEMBERS") || !message.member.permissions.has("KICK_MEMBERS")) {
-      return message.channel.send("У вас нет прав [Банить или Кикать]");
-    } else if (!member) {
+    if (!member) {
       return message.channel.send("Укажите пользователя для получения предупреждений");
     }
 
