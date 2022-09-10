@@ -1,5 +1,6 @@
 .replit
-node_modules
 replit.nix
 json.sqlite
+node_modules/
 heroku-sample-app/
+clever-bot-api/
