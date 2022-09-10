@@ -1,4 +1,5 @@
 .replit
+.breakpoints
 replit.nix
 json.sqlite
 node_modules/
