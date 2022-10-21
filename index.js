@@ -2,7 +2,7 @@ const Discord = require("discord.js");
 const fs = require("fs");
 
 const client = new Discord.Client({ intents: 28373 });
-client.commands = new Discord.Collection();
+client.commands = new Discord.Collection(); 
 
 // .env
 const prefix = process.env.prefix;
@@ -20,13 +20,13 @@ try {
     });
   })
 
-  client.on("disconnect", async () => {
-    console.log("Отключился!")
-  })
+  client.on("error", (e) => {
+    console.log("Ошибка:", e);
+  });
   
-  client.on("reconnecting", async () => {
-    console.log("Переподключение!")
-  })
+  client.on("debug", (e) => {
+    console.log("Отладка:", e);
+  });
 } catch (e) {
   console.log(e)
 }
